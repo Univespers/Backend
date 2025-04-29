@@ -8,7 +8,8 @@ export class Datapoints {
 
     async loginUsuario(emailHash, senhaHash) {
         try {
-            this.processes.callProcedure(`LOGIN(${emailHash}, ${senhaHash})`);
+            const [token] = await this.processes.callProcedure(`LOGIN("${emailHash}", "${senhaHash}")`);
+            return token;
         } catch(error) {
             console.error("Erro no login: ", error);
         }

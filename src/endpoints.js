@@ -26,17 +26,26 @@ export class Endpoints {
         // 🔐 Rota: Login
         this.app.post(`${usuarioEndpoint}/login`, async (requisito, resposta) => {
             try {
-                const email = requisito.body.email;
-                const senha = requisito.body.password;
+                const email = processes.getHash(requisito.body.email);
+                const senha = processes.getHash(requisito.body.password);
                 const token = await datapoints.loginUsuario(email, senha);
-                if(token) {
-                    resposta.json(token);
-                } else {
-                    resposta.status(500).json({
-                        error: {
-                            message: "NOT_FOUND"
-                        }
+                if(token && !token.response) {
+                    resposta.json({
+                        token: `${token.uuid}`,
+                        tipo: `${token.tipo}`,
+                        validade: token.validade
                     });
+                } else {
+                    switch(token.response) {
+                        case "not_found":
+                        default:
+                            resposta.status(500).json({
+                                error: {
+                                    message: "NOT_FOUND"
+                                }
+                            });
+                            break;
+                    }
                 }
             } catch(error) {
                 resposta.status(500).json({
