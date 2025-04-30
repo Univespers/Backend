@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 
+import { CurrentStatus } from './status.js';
+
 const PORT = 3000;
 const apiEndpoint = "api";
 const infoEndpoint = `/${apiEndpoint}/info`;
@@ -22,6 +24,24 @@ export class Endpoints {
     }
 
     load(processes, datapoints) {
+
+        // ℹ️ Rota: Info
+        this.app.get(``, async (requisito, resposta) => {
+            try {
+                resposta.json({
+                    versão: `${CurrentStatus.CURRENT_VERSION}`,
+                    nome: `${CurrentStatus.PROJECT_NAME}`,
+                    grupo: `${CurrentStatus.GROUP_NAME}`
+                });
+            } catch(error) {
+                resposta.status(500).json({
+                    error: {
+                        message: "ERROR",
+                        details: error.message
+                    }
+                });
+            }
+        });
 
         // 🔐 Rota: Login
         this.app.post(`${usuarioEndpoint}/login`, async (requisito, resposta) => {
