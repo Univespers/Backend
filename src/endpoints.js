@@ -57,6 +57,46 @@ export class Endpoints {
             }
         });
 
+        // 🔐 Rota: Cadastro de Usuário
+        this.app.post(`${usuarioEndpoint}/novo`, async (requisito, resposta) => {
+            try {
+                const email = processes.getHash(requisito.body.email);
+                const senha = processes.getHash(requisito.body.password);
+                const message = await datapoints.cadastrarUsuario(email, senha);
+                if(message.response === "ok") {
+                    const token = await datapoints.loginUsuario(email, senha);
+
+                    console.log(token);
+
+                    if(token && !token.response) {
+                        resposta.json({
+                            token: `${token.uuid}`,
+                            tipo: `${token.tipo}`,
+                            validade: token.validade
+                        });
+                    } else {
+                        switch(token.response) {
+                            case "not_found":
+                            default:
+                                resposta.status(500).json({
+                                    error: {
+                                        message: "NOT_FOUND"
+                                    }
+                                });
+                                break;
+                        }
+                    }
+                }
+            } catch(error) {
+                resposta.status(500).json({
+                    error: {
+                        message: "ERROR",
+                        details: error.message
+                    }
+                });
+            }
+        });
+
         // // ✅ Rota: Listar alunos (dados reais do banco)
         // this.app.get("/api/colleagues/list", async (requisito, resposta) => {
         //     try {
