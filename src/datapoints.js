@@ -11,7 +11,7 @@ export class Datapoints {
             const [token] = await this.processes.callProcedure(`Login("${emailHash}", "${senhaHash}")`);
             return token;
         } catch(error) {
-            console.error("Erro no login: ", error);
+            console.error(`Login: ${error.message}`);
         }
     }
 
@@ -22,7 +22,7 @@ export class Datapoints {
             const [token] = await this.processes.callProcedure(`NovoUsuario("${emailHash}", "${senhaHash}", "${tipo}")`);
             return token;
         } catch(error) {
-            console.error("Erro no cadastro: ", error);
+            console.error(`NovoUsuário: ${error.message}`);
         }
     }
 
@@ -31,7 +31,7 @@ export class Datapoints {
             const [mensagem] = await this.processes.callProcedure(`NovoEstudante("${token}", "${nome}", "${emailInstitucional}", "${polo}", "${curso}")`);
             return mensagem;
         } catch(error) {
-            console.error(`CadastroEstudante: ${error.message}`);
+            console.error(`NovoEstudante: ${error.message}`);
         }
     }
 

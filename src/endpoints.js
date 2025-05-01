@@ -20,123 +20,117 @@ export class Endpoints {
     constructor(processes, datapoints) {
         this.app.use(cors()); // Allow different domains
         this.app.use(express.json()); // Allow JSON parsing
-
+        // Carrega endpoints
         this.load(processes, datapoints);
     }
 
     load(processes, datapoints) {
 
         // ℹ️ Rota: Info
-        this.app.get(``, async (requisito, resposta) => {
+        this.app.get(``, getInfo);
+        this.app.get(`${apiEndpoint}`, getInfo);
+        this.app.get(`${infoEndpoint}`, getInfo);
+        async function getInfo(requisito, resposta) {
             try {
+                // Resposta
+                console.log(`Info: ok`);
                 resposta.json({
                     versão: `${CurrentStatus.CURRENT_VERSION}`,
                     nome: `${CurrentStatus.PROJECT_NAME}`,
                     grupo: `${CurrentStatus.GROUP_NAME}`
                 });
             } catch(error) {
-                resposta.status(500).json({
-                    error: {
-                        message: "ERROR",
-                        details: error.message
-                    }
-                });
+                console.error(`Info: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
             }
-        });
+        }
 
         // 🔐 Rota: Login
         this.app.post(`${usuarioEndpoint}/login`, async (requisito, resposta) => {
             try {
+                // Body
                 const email = processes.getHash(requisito.body.email);
                 const senha = processes.getHash(requisito.body.password);
+                // Database request
                 const token = await datapoints.loginUsuario(email, senha);
+                // Resposta
                 if(token && !token.response) {
+                    console.log(`Login: ok`);
                     resposta.json({
                         token: `${token.uuid}`,
                         tipo: `${token.tipo}`,
                         validade: token.validade
                     });
                 } else {
+                    console.error(`Login: ${message.response}`);
                     switch(token.response) {
-                        case "not_found":
-                        default:
-                            resposta.status(500).json({
-                                error: {
-                                    message: "NOT_FOUND"
-                                }
-                            });
+                        case "not_found": default:
+                            resposta.status(500).json({ error: { message: "NOT_FOUND" } });
                             break;
                     }
                 }
             } catch(error) {
-                resposta.status(500).json({
-                    error: {
-                        message: "ERROR",
-                        details: error.message
-                    }
-                });
+                console.error(`Login: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
             }
         });
 
         // 🔐 Rota: Cadastro de Usuário
         this.app.post(`${usuarioEndpoint}/novo`, async (requisito, resposta) => {
             try {
+                // Body
                 const email = processes.getHash(requisito.body.email);
                 const senha = processes.getHash(requisito.body.password);
+                // Database request
                 const message = await datapoints.cadastrarUsuario(email, senha);
+                // Resposta
                 if(message.response === "ok") {
+                    console.log(`NovoUsuário: ${message.response}`);
+                    // Database request
                     const token = await datapoints.loginUsuario(email, senha);
-
-                    console.log(token);
-
+                    // Resposta
                     if(token && !token.response) {
+                        console.log(`Login: ok`);
                         resposta.json({
                             token: `${token.uuid}`,
                             tipo: `${token.tipo}`,
                             validade: token.validade
                         });
                     } else {
+                        console.error(`Login: ${message.response}`);
                         switch(token.response) {
-                            case "not_found":
-                            default:
-                                resposta.status(500).json({
-                                    error: {
-                                        message: "NOT_FOUND"
-                                    }
-                                });
+                            case "not_found": default:
+                                resposta.status(500).json({ error: { message: "NOT_FOUND" } });
                                 break;
                         }
                     }
                 }
             } catch(error) {
-                resposta.status(500).json({
-                    error: {
-                        message: "ERROR",
-                        details: error.message
-                    }
-                });
+                console.error(`NovoUsuário: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
             }
         });
 
         // 📑 Rota: Cadastro de Estudante
         this.app.post(`${estudanteEndpoint}/novo`, async (requisito, resposta) => {
             try {
+                // Header
                 const token = requisito.get(HEADER_TOKEN);
-
+                // Body
                 const nome = requisito.body.nome;
                 const emailInstitucional = requisito.body.emailInstitucional;
                 const polo = requisito.body.polo;
                 const curso = requisito.body.curso;
-
+                // Database request
                 const message = await datapoints.criarEstudante(token, nome, emailInstitucional, polo, curso);
-
+                // Resposta
                 if(message.response === "ok") {
-                    console.log(`CadastroEstudante: ${message.response}`);
+                    console.log(`NovoEstudante: ${message.response}`);
                     resposta.json({
                         response: "OK"
                     });
                 } else {
-                    console.error(`CadastroEstudante: ${message.response}`);
+                    console.error(`NovoEstudante: ${message.response}`);
                     switch(message.response) {
                         case "not_found":
                             resposta.status(500).json({ error: { message: "TOKEN_NOT_FOUND" } });
@@ -153,7 +147,7 @@ export class Endpoints {
                     }
                 }
             } catch(error) {
-                console.error(`CadastroEstudante: ${error.message}`);
+                console.error(`NovoEstudante: ${error.message}`);
                 resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
             }
         });
