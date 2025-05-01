@@ -86,23 +86,24 @@ export class Endpoints {
                 // Resposta
                 if(message.response === "ok") {
                     console.log(`NovoUsuário: ${message.response}`);
-                    // Database request
-                    const token = await datapoints.loginUsuario(email, senha);
-                    // Resposta
-                    if(token && !token.response) {
-                        console.log(`Login: ok`);
-                        resposta.json({
-                            token: `${token.uuid}`,
-                            tipo: `${token.tipo}`,
-                            validade: token.validade
-                        });
-                    } else {
-                        console.error(`Login: ${message.response}`);
-                        switch(token.response) {
-                            case "not_found": default:
-                                resposta.status(500).json({ error: { message: "NOT_FOUND" } });
-                                break;
-                        }
+                    resposta.json({
+                        response: "OK"
+                    });
+                } else {
+                    console.error(`NovoUsuário: ${message.response}`);
+                    switch(message.response) {
+                        case "not_found":
+                            resposta.status(500).json({ error: { message: "TOKEN_NOT_FOUND" } });
+                            break;
+                        case "already_exists":
+                            resposta.status(500).json({ error: { message: "ALREADY_EXISTS" } });
+                            break;
+                        case "expired":
+                            resposta.status(500).json({ error: { message: "TOKEN_EXPIRED" } });
+                            break;
+                        default:
+                            resposta.status(500).json({ error: { message: "ERROR" } });
+                            break;
                     }
                 }
             } catch(error) {
