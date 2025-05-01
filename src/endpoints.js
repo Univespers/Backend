@@ -11,6 +11,7 @@ const usuarioEndpoint = `/${apiEndpoint}/usuario`;
 const estudanteEndpoint = `/${apiEndpoint}/estudante`;
 // const grupoEndpoint = `/${apiEndpoint}/grupo`;
 // const chatEndpoint = `/${apiEndpoint}/chat`;
+const HEADER_TOKEN = "X-Authentication-Token";
 
 export class Endpoints {
 
@@ -114,6 +115,46 @@ export class Endpoints {
                         details: error.message
                     }
                 });
+            }
+        });
+
+        // 📑 Rota: Cadastro de Estudante
+        this.app.post(`${estudanteEndpoint}/novo`, async (requisito, resposta) => {
+            try {
+                const token = requisito.get(HEADER_TOKEN);
+
+                const nome = requisito.body.nome;
+                const emailInstitucional = requisito.body.emailInstitucional;
+                const polo = requisito.body.polo;
+                const curso = requisito.body.curso;
+
+                const message = await datapoints.criarEstudante(token, nome, emailInstitucional, polo, curso);
+
+                if(message.response === "ok") {
+                    console.log(`CadastroEstudante: ${message.response}`);
+                    resposta.json({
+                        response: "OK"
+                    });
+                } else {
+                    console.error(`CadastroEstudante: ${message.response}`);
+                    switch(message.response) {
+                        case "not_found":
+                            resposta.status(500).json({ error: { message: "TOKEN_NOT_FOUND" } });
+                            break;
+                        case "already_exists":
+                            resposta.status(500).json({ error: { message: "ALREADY_EXISTS" } });
+                            break;
+                        case "expired":
+                            resposta.status(500).json({ error: { message: "TOKEN_EXPIRED" } });
+                            break;
+                        default:
+                            resposta.status(500).json({ error: { message: "ERROR" } });
+                            break;
+                    }
+                }
+            } catch(error) {
+                console.error(`CadastroEstudante: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
             }
         });
 

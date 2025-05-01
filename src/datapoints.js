@@ -26,4 +26,13 @@ export class Datapoints {
         }
     }
 
+    async criarEstudante(token, nome, emailInstitucional, polo, curso) {
+        try {
+            const [mensagem] = await this.processes.callProcedure(`NovoEstudante("${token}", "${nome}", "${emailInstitucional}", "${polo}", "${curso}")`);
+            return mensagem;
+        } catch(error) {
+            console.error(`CadastroEstudante: ${error.message}`);
+        }
+    }
+
 }
