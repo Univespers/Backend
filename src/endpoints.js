@@ -153,6 +153,30 @@ export class Endpoints {
             }
         });
 
+        // 📑 Rota: Pesquisar Colegas
+        this.app.get(`${estudanteEndpoint}/colegas`, async (requisito, resposta) => {
+            try {
+                // Params
+                const termo = requisito.query.termo;
+                const pagina = parseInt(requisito.query.pagina) - 1;
+                const quantidade = parseInt(requisito.query.quantidade);
+                // Consulta ao banco
+                const message = await datapoints.pesquisarColegas(termo, pagina, quantidade);
+                // Resposta
+                console.log(`PesquisarColegas: LISTA`);
+                resposta.json({
+                    lista: message,
+                    pagina: pagina + 1,
+                    totalPaginas: message[0].totalColegas
+                });
+            } catch (error) {
+                console.error(`PesquisarColegas: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
+            }
+        });
+
+
+
         // // ✅ Rota: Listar alunos (dados reais do banco)
         // this.app.get("/api/colleagues/list", async (requisito, resposta) => {
         //     try {
