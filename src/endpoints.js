@@ -158,16 +158,17 @@ export class Endpoints {
             try {
                 // Params
                 const termo = requisito.query.termo;
-                const pagina = parseInt(requisito.query.pagina) - 1;
+                const pagina = parseInt(requisito.query.pagina);
                 const quantidade = parseInt(requisito.query.quantidade);
                 // Consulta ao banco
-                const message = await datapoints.pesquisarColegas(termo, pagina, quantidade);
+                const message = await datapoints.pesquisarColegas(termo, pagina - 1, quantidade);
                 // Resposta
                 console.log(`PesquisarColegas: LISTA`);
+                console.log(termo);
                 resposta.json({
                     lista: message,
-                    pagina: pagina + 1,
-                    totalPaginas: message[0].totalColegas
+                    pagina: pagina,
+                    totalPaginas: message[0]?.total ?? 0
                 });
             } catch (error) {
                 console.error(`PesquisarColegas: ${error.message}`);
@@ -175,73 +176,6 @@ export class Endpoints {
             }
         });
 
-
-
-        // // ✅ Rota: Listar alunos (dados reais do banco)
-        // this.app.get("/api/colleagues/list", async (requisito, resposta) => {
-        //     try {
-        //     const conn = await conectar();
-        //     const [rows] = await conn.execute("SELECT * FROM Aluno");
-        //     res.json({ lista: rows });
-        //     await conn.end();
-        //     } catch (err) {
-        //     res.status(500).json({ error: "Erro ao buscar alunos", details: err.message });
-        //     }
-        // });
-    
-        // // ✅ Rota: Detalhes de um aluno
-        // this.app.get("/api/colleagues/:id/details", async (req, res) => {
-        //     const { id } = req.params;
-        //     try {
-        //     const conn = await conectar();
-        //     const [rows] = await conn.execute("SELECT * FROM Aluno WHERE id = ?", [id]);
-    
-        //     if (rows.length === 0) return res.status(404).json({ error: "Aluno não encontrado" });
-    
-        //     const aluno = rows[0];
-        //     res.json({
-        //         id: aluno.id,
-        //         nome: aluno.nome,
-        //         curso: aluno.curso,
-        //         polo: aluno.polo,
-        //         emailInstitucional: aluno.email_institucional,
-        //         descricao: aluno.descricao,
-        //         contatos: {
-        //             email: aluno.email_pessoal,
-        //             linkedin: aluno.linkedin,
-        //         },
-        //     });
-        //     await conn.end();
-        //     } catch (err) {
-        //     res.status(500).json({ error: "Erro ao buscar detalhes", details: err.message });
-        //     }
-        // });
-    
-        // // ✅ Rota: Cadastrar aluno
-        // this.app.post("/api/colleagues", async (req, res) => {
-        //     const {
-        //         nome,
-        //         curso,
-        //         polo,
-        //         emailInstitucional,
-        //         descricao,
-        //         emailPessoal,
-        //         linkedin,
-        //     } = req.body;
-    
-        //     try {
-        //     const conn = await conectar();
-        //     await conn.execute(
-        //         `INSERT INTO Aluno (nome, curso, polo, email_institucional, descricao, email_pessoal, linkedin)
-        //         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        //         [nome, curso, polo, emailInstitucional, descricao, emailPessoal, linkedin]
-        //     );
-        //     await conn.end();
-        //     res.status(201).json({ message: "Aluno cadastrado com sucesso!" });
-        //     } catch (err) {
-        //     res.status(500).json({ error: "Erro ao cadastrar aluno", details: err.message });
-        //     }
-        // });
     }
 
     start() {

@@ -2,6 +2,6 @@ export class CurrentStatus {
 
     static GROUP_NAME = "Univespers";
     static PROJECT_NAME = "Univespers";
-    static CURRENT_VERSION = "1.1.0-alpha";
+    static CURRENT_VERSION = "1.2.0-alpha";
 
 }
