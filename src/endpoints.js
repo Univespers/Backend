@@ -75,6 +75,42 @@ export class Endpoints {
             }
         });
 
+        // 🔐 Rota: Logout
+        this.app.get(`${usuarioEndpoint}/logout`, async (requisito, resposta) => {
+            try {
+                // Header
+                const token = requisito.get(HEADER_TOKEN);
+                // Database request
+                const message = await datapoints.logoutUsuario(token);
+                // Resposta
+                if(message.response === "ok") {
+                    console.log(`Logout: ${message.response}`);
+                    resposta.json({
+                        response: "OK"
+                    });
+                } else {
+                    console.error(`Logout: ${message.response}`);
+                    switch(message.response) {
+                        case "not_found":
+                            resposta.status(500).json({ error: { message: "TOKEN_NOT_FOUND" } });
+                            break;
+                        case "already_exists":
+                            resposta.status(500).json({ error: { message: "ALREADY_EXISTS" } });
+                            break;
+                        case "expired":
+                            resposta.status(500).json({ error: { message: "TOKEN_EXPIRED" } });
+                            break;
+                        default:
+                            resposta.status(500).json({ error: { message: "ERROR" } });
+                            break;
+                    }
+                }
+            } catch(error) {
+                console.error(`Logout: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
+            }
+        });
+
         // 🔐 Rota: Cadastro de Usuário
         this.app.post(`${usuarioEndpoint}/novo`, async (requisito, resposta) => {
             try {

@@ -15,6 +15,15 @@ export class Datapoints {
         }
     }
 
+    async logoutUsuario(token) {
+        try {
+            const mensagem = await this.processes.callProcedure(`Logout("${token}")`);
+            return mensagem[0];
+        } catch(error) {
+            console.error(`Logout: ${error.message}`);
+        }
+    }
+
     async cadastrarUsuario(emailHash, senhaHash) {
         try {
             const autorizacoes = await this.processes.callProcedure(`GetAutorizacoes()`);
