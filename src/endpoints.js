@@ -176,6 +176,53 @@ export class Endpoints {
             }
         });
 
+        // 📑 Rota: Get Colega
+        this.app.get(`${estudanteEndpoint}/colegas/:uuid`, async (requisito, resposta) => {
+            try {
+                // Params
+                const uuid = requisito.params.uuid;
+                // Consulta ao banco
+                const message = await datapoints.getColega(uuid);
+                // Resposta
+                console.log(`GetColega: COLEGA`);
+                resposta.json({
+                    uuid: message.uuid,
+                    nome: message.nome,
+                    polo: message.polo,
+                    curso: message.curso
+                });
+            } catch (error) {
+                console.error(`GetColega: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
+            }
+        });
+
+        // 📑 Rota: Get Colega Detalhes
+        this.app.get(`${estudanteEndpoint}/colegas/:uuid/detalhes`, async (requisito, resposta) => {
+            try {
+                // Params
+                const uuid = requisito.params.uuid;
+                // Consulta ao banco
+                const colegaDetalhes = await datapoints.getColegaDetalhes(uuid);
+                const colegaContatos = processes.getColegaContatos(await datapoints.getColegaContatos(uuid));
+                // Resposta
+                console.log(`GetColegaDetalhes: COLEGA_DETALHES`);
+                resposta.json({
+                    uuid: colegaDetalhes.uuid,
+                    nome: colegaDetalhes.nome,
+                    polo: colegaDetalhes.polo,
+                    curso: colegaDetalhes.curso,
+                    descricao: colegaDetalhes.descricao,
+                    telefone: colegaDetalhes.telefone,
+                    temWhatsapp: (colegaDetalhes.temWhatsapp == 1? true : false),
+                    contatos: colegaContatos
+                });
+            } catch (error) {
+                console.error(`GetColegaDetalhes: ${error.message}`);
+                resposta.status(500).json({ error: { message: "ERROR", details: error.message } });
+            }
+        });
+
     }
 
     start() {

@@ -44,4 +44,34 @@ export class Processes {
         return hash.digest('hex');
     }
 
+    getColegaContatos(lista) {
+        let contatos = {};
+        for(let contato of lista) {
+            switch(contato.nome) {
+                case "Email":
+                    contatos["email"] = contato.link;
+                    break;
+                case "LinkedIn":
+                    contatos["linkedin"] = contato.link;
+                    break;
+                case "Facebook":
+                    contatos["facebook"] = contato.link;
+                    break;
+                case "Instagram":
+                    contatos["instagram"] = contato.link;
+                    break;
+                case "Discord":
+                    contatos["discord"] = contato.link;
+                    break;
+                case "GitHub":
+                    contatos["github"] = contato.link;
+                    break;
+                case "Reddit":
+                    contatos["reddit"] = contato.link;
+                    break;
+            }
+        }
+        return contatos;
+    }
+
 }

@@ -37,10 +37,37 @@ export class Datapoints {
 
     async pesquisarColegas(termo, pagina, quantidade) {
         try {
-            const mensagem = await this.processes.callProcedure(`PesquisarColegas("${termo}", ${pagina}, ${quantidade})`);
-            return mensagem;
+            const mensagem = await this.processes.callProcedure(`PesquisarColegas("${termo}", ${pagina * quantidade}, ${quantidade})`);
+            return mensagem; // Lista
         } catch (error) {
             console.error(`PesquisarColegas: ${error.message}`);
+        }
+    }
+
+    async getColega(uuid) {
+        try {
+            const mensagem = await this.processes.callProcedure(`GetColega("${uuid}")`);
+            return mensagem[0];
+        } catch (error) {
+            console.error(`GetColega: ${error.mensagem}`);
+        }
+    }
+
+    async getColegaDetalhes(uuid) {
+        try {
+            const mensagem = await this.processes.callProcedure(`GetColegaDetalhes("${uuid}")`);
+            return mensagem[0];
+        } catch (error) {
+            console.error(`GetColegaDetalhes: ${error.mensagem}`);
+        }
+    }
+
+    async getColegaContatos(uuid) {
+        try {
+            const mensagem = await this.processes.callProcedure(`GetColegaContatos("${uuid}")`);
+            return mensagem; // Lista
+        } catch (error) {
+            console.error(`GetColegaContatos: ${error.mensagem}`);
         }
     }
 
