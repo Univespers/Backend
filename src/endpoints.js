@@ -168,7 +168,7 @@ export class Endpoints {
                 resposta.json({
                     lista: message,
                     pagina: pagina,
-                    totalPaginas: message[0]?.total ?? 0
+                    totalPaginas: Math.ceil((message[0]?.total ?? 0) / quantidade)
                 });
             } catch (error) {
                 console.error(`PesquisarColegas: ${error.message}`);
